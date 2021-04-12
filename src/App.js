@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react'
+import Context from './context'
+import Header from './components/Header'
+import Content from './components/Content'
+import Loader from './components/Loader'
 
-function App() {
+import generateUri from './utils/generateUri'
+
+const base_url = 'https://jsonplaceholder.typicode.com/'
+
+const App = () => {
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(generateUri(base_url, 'posts', { _limit: 15 }))
+      .then((response) => response.json())
+      .then((posts) => {
+        setTimeout(() => {
+          setPosts(posts)
+          setLoading(false)
+        }, 300)
+      })
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Context.Provider value={{ posts }}>
+      <Header />
+      {loading ? <Loader /> : <Content />}
+    </Context.Provider>
+  )
 }
 
-export default App;
+export default App
